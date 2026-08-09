@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BuildMetrick — Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased;transition:background .35s ease,color .35s ease;}
+    a{text-decoration:none;color:inherit;}
+    ul{list-style:none;}
+    button{cursor:pointer;font-family:inherit;border:none;outline:none;}
+
+    :root,[data-theme="light"]{
+      --brand:#5B3FA6;--brand-dark:#3C2880;--brand-deep:#1E0D4E;--brand-nav:#120B30;
+      --brand-light:#EDE9FA;--brand-mid:#9B72D4;--cream:#F7F4EE;--lavender:#F0EBFF;
+      --bg:#ffffff;--card-bg:#ffffff;--items-bg:var(--lavender);
+      --text:#1a1a1a;--text-mid:#55556A;--text-light:#888899;--white:#fff;
+      --border:rgba(0,0,0,0.08);--sh-sm:0 2px 10px rgba(91,63,166,0.10);
+      --sh:0 6px 28px rgba(91,63,166,0.15);--sh-lg:0 12px 48px rgba(91,63,166,0.22);
+      --r:20px;--r-sm:12px;--r-xs:8px;--nav-h:74px;--max-w:1180px;
+      --pattern-stroke:rgba(91,63,166,0.12);
+      --border-tint:rgba(91,63,166,0.1);--item-hover-bg:rgba(91,63,166,0.04);
+      --input-bg:#fff;--placeholder:#bbb;--print-hover:#ddd5f7;
+    }
+    [data-theme="dark"]{
+      --brand:#7B5FCC;--brand-dark:#5B3FA6;--brand-deep:#C4A6F0;--brand-nav:#0D0820;
+      --brand-light:rgba(123,95,204,0.18);--brand-mid:#9B72D4;--cream:#13102A;--lavender:#1A1535;
+      --bg:#0F0D1E;--card-bg:#1E1A38;--items-bg:#171331;
+      --text:#E8E4FF;--text-mid:#A89EC8;--text-light:#6B6388;--white:#fff;
+      --border:rgba(255,255,255,0.08);--sh-sm:0 2px 10px rgba(0,0,0,0.4);
+      --sh:0 6px 28px rgba(0,0,0,0.5);--sh-lg:0 12px 48px rgba(0,0,0,0.6);
+      --r:20px;--r-sm:12px;--r-xs:8px;--nav-h:74px;--max-w:1180px;
+      --pattern-stroke:rgba(123,95,204,0.22);
+      --border-tint:rgba(123,95,204,0.28);--item-hover-bg:rgba(123,95,204,0.1);
+      --input-bg:#252044;--placeholder:#5A5280;--print-hover:rgba(123,95,204,0.32);
+    }
+    body{background:var(--bg);color:var(--text);}
+    *,*::before,*::after{transition:background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease;}
+    .hamburger span,.theme-toggle-track,.theme-toggle-thumb{transition:unset;}
+    .hamburger span{transition:all .28s;}
+    .theme-toggle-track{transition:background .3s ease;}
+    .theme-toggle-thumb{transition:transform .3s ease,background .3s ease;}
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle{display:flex;align-items:center;gap:8px;margin-left:8px;}
+    .theme-toggle-label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.65);letter-spacing:0.4px;user-select:none;min-width:32px;}
+    .theme-toggle-btn{position:relative;width:48px;height:26px;background:none;border:none;cursor:pointer;padding:0;}
+    .theme-toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.15);border-radius:50px;border:1.5px solid rgba(255,255,255,0.2);}
+    [data-theme="dark"] .theme-toggle-track{background:rgba(123,95,204,0.4);border-color:rgba(123,95,204,0.6);}
+    .theme-toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;}
+    [data-theme="light"] .theme-toggle-thumb{transform:translateX(22px);background:#EDE9FA;}
+    .theme-toggle-thumb svg{width:11px;height:11px;}
+    .icon-moon{display:block;stroke:#3C2880;fill:none;}
+    .icon-sun{display:none;stroke:#7B5FCC;fill:#C4A6F0;}
+    [data-theme="light"] .icon-moon{display:none;}
+    [data-theme="light"] .icon-sun{display:block;}
+    .mobile-theme-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0 8px;}
+    .mobile-theme-label{color:rgba(255,255,255,0.78);font-size:15px;font-weight:500;}
+
+    .container{max-width:var(--max-w);margin:0 auto;padding:0 28px;}
+
+    /* ── NAVBAR ── */
+    .navbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:1000;background:var(--brand-nav);display:flex;align-items:center;box-shadow:0 2px 20px rgba(0,0,0,0.35);}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;}
+    .nav-logo{display:flex;align-items:center;gap:10px;}
+    .nav-logo-svg{width:42px;height:42px;flex-shrink:0;}
+    .nav-brand{color:#fff;font-size:13px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;}
+    .nav-links{display:flex;align-items:center;gap:2px;}
+    .nav-sep{color:rgba(255,255,255,0.25);padding:0 3px;font-size:14px;}
+    .nav-links a{color:rgba(255,255,255,0.72);font-size:13.5px;font-weight:500;padding:7px 12px;border-radius:var(--r-xs);transition:all .18s;}
+    .nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,0.1);}
+    .nav-auth{display:flex;align-items:center;gap:6px;}
+    .nav-login{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.78);font-size:13.5px;font-weight:500;padding:7px 15px;border-radius:50px;transition:all .18s;}
+    .nav-login:hover{background:rgba(255,255,255,0.1);color:#fff;}
+    .nav-login svg{width:15px;height:15px;}
+    .nav-signup{background:var(--brand);color:#fff;font-size:13.5px;font-weight:600;padding:8px 20px;border-radius:50px;transition:all .18s;}
+    .nav-signup:hover{background:var(--brand-dark);}
+    .hamburger{display:none;flex-direction:column;gap:5px;padding:8px;background:none;}
+    .hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .28s;}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+    .mobile-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:var(--brand-nav);z-index:999;padding:8px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,0.35);border-top:1px solid rgba(255,255,255,0.08);}
+    .mobile-menu.open{display:block;}
+    .mobile-menu a{display:block;color:rgba(255,255,255,0.78);font-size:15px;font-weight:500;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.07);transition:color .15s;}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu a:hover{color:#fff;}
+
+    /* ── CALCULATOR PAGE LAYOUT ── */
+    .calc-page{
+      padding-top:var(--nav-h);
+      min-height:100vh;
+      background-color:var(--lavender);
+      background-image:url("data:image/svg+xml,%3Csvg width='60' height='70' viewBox='0 0 60 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 1L59 17.5V52.5L30 69L1 52.5V17.5L30 1Z' stroke='rgba(91%2C63%2C166%2C0.12)' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+      background-size:60px 70px;
+    }
+    [data-theme="dark"] .calc-page{
+      background-image:url("data:image/svg+xml,%3Csvg width='60' height='70' viewBox='0 0 60 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 1L59 17.5V52.5L30 69L1 52.5V17.5L30 1Z' stroke='rgba(123%2C95%2C204%2C0.16)' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+    }
+    .calc-page-inner{padding:60px 0 80px;}
+
+    /* Two-column layout: calc left, info right */
+    .calc-layout{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:40px;
+      align-items:start;
+    }
+
+    /* ── INFO PANEL (left) ── */
+    .calc-info-panel{position:sticky;top:calc(var(--nav-h) + 24px);}
+    .calc-info-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--brand-light);border-radius:50px;
+      padding:6px 16px;font-size:11px;font-weight:700;
+      color:var(--brand);letter-spacing:1.5px;text-transform:uppercase;
+      margin-bottom:20px;
+    }
+    .calc-info-badge svg{width:13px;height:13px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .calc-info-panel h1{
+      font-size:clamp(28px,3.5vw,42px);
+      font-weight:900;color:var(--brand-deep);
+      line-height:1.1;margin-bottom:16px;letter-spacing:-0.5px;
+    }
+    .calc-info-panel h1 span{color:var(--brand);}
+    .calc-info-panel > p{font-size:16px;color:var(--text-mid);line-height:1.75;margin-bottom:28px;}
+
+    /* Feature pills */
+    .calc-features{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+    .calc-feature{
+      display:flex;align-items:center;gap:12px;
+      background:var(--card-bg);border-radius:var(--r-sm);
+      padding:12px 16px;
+      border:1px solid var(--border-tint);
+      box-shadow:var(--sh-sm);
+    }
+    .calc-feature-icon{
+      width:36px;height:36px;flex-shrink:0;
+      background:var(--brand-light);border-radius:9px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .calc-feature-icon svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+    .calc-feature-text strong{display:block;font-size:13px;font-weight:700;color:var(--brand-deep);}
+    .calc-feature-text span{font-size:12px;color:var(--text-light);}
+
+    /* Tags row */
+    .calc-tags{display:flex;gap:8px;flex-wrap:wrap;}
+    .ctag{
+      background:var(--brand-light);color:var(--brand-dark);
+      font-size:11px;font-weight:600;padding:5px 12px;
+      border-radius:12px;display:flex;align-items:center;gap:4px;
+    }
+    .ctag svg{width:11px;height:11px;stroke:var(--brand-dark);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+    /* ── CALCULATOR CARD (right) ── */
+    .calc-card{
+      background:var(--card-bg);
+      border-radius:var(--r);
+      overflow:hidden;
+      box-shadow:var(--sh-lg);
+    }
+
+    /* Header */
+    .calc-head{background:var(--brand);padding:22px 26px 18px;}
+    .calc-head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .calc-brand-row{display:flex;align-items:center;gap:10px;}
+    .calc-brand-icon{
+      width:36px;height:36px;background:rgba(255,255,255,0.18);
+      border-radius:9px;display:flex;align-items:center;justify-content:center;
+    }
+    .calc-brand-icon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+    .calc-brand-name{color:#fff;font-size:15px;font-weight:700;}
+    .calc-brand-sub{color:rgba(255,255,255,0.6);font-size:11px;margin-top:1px;}
+    .calc-confirm-btn{
+      background:#fff;color:var(--brand-dark);border-radius:50px;
+      padding:9px 16px;font-size:13px;font-weight:600;
+      display:flex;align-items:center;gap:6px;
+      transition:opacity .15s,transform .1s;
+    }
+    .calc-confirm-btn:hover{opacity:.88;}
+    .calc-confirm-btn:active{transform:scale(.96);}
+    .calc-confirm-btn svg{width:14px;height:14px;stroke:var(--brand-dark);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+    /* Total pill */
+    .calc-total-pill{
+      background:rgba(255,255,255,0.15);
+      border-radius:12px;padding:13px 17px;
+      display:flex;justify-content:space-between;
+    }
+    .calc-pill-lbl{color:rgba(255,255,255,0.6);font-size:11px;margin-bottom:3px;}
+    .calc-pill-val{color:#fff;font-size:22px;font-weight:800;}
+
+    /* Body */
+    .calc-body{padding:22px 26px 28px;}
+    .calc-sub-lbl{
+      font-size:10px;font-weight:700;color:var(--text-light);
+      text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
+    }
+
+    /* Items wrapper */
+    .calc-items-wrap{
+      background:var(--items-bg);border-radius:var(--r-sm);
+      overflow:hidden;margin-bottom:16px;
+      border:1px solid var(--border-tint);
+    }
+    .calc-item{
+      display:flex;align-items:center;padding:13px 15px;gap:12px;
+      border-bottom:1px solid var(--border-tint);
+      transition:background .12s;
+    }
+    .calc-item:last-child{border-bottom:none;}
+    .calc-item:hover{background:var(--item-hover-bg);}
+
+    .ci-icon{
+      width:38px;height:38px;background:var(--brand-light);
+      border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .ci-icon svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+    .ci-info{flex:1;min-width:0;}
+    .ci-name{font-size:14px;font-weight:600;color:var(--text);}
+    .ci-price{font-size:11px;color:var(--text-light);margin-top:1px;}
+    .ci-sub {
+        grid-column: 1 / -1;     
+        padding: 10px 14px;
+
+        background: #6044bb;
+        border: 1px solid rgb(15, 0, 68) ;
+        border-radius: 8px;
+        text-align: right;
+        color: rgb(252, 252, 253);
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    /* Counter */
+    .ci-counter{display:flex;align-items:center;gap:7px;}
+    .ci-btn{
+      width:30px;height:30px;border-radius:8px;
+      background:var(--brand);border:none;color:#fff;
+      font-size:18px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .12s,transform .08s;
+    }
+    .ci-btn:hover{background:var(--brand-dark);}
+    .ci-btn:active{transform:scale(.9);}
+    .ci-qty{
+      width:32px;text-align:center;font-size:14px;font-weight:600;
+      color:var(--text);background:var(--input-bg);
+      border:1px solid var(--border-tint);border-radius:6px;padding:4px 0;
+    }
+
+    /* Category selector tabs */
+    .calc-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+    .calc-tab{
+      padding:7px 14px;border-radius:50px;font-size:12px;font-weight:600;
+      background:var(--brand-light);color:var(--brand-dark);
+      cursor:pointer;transition:all .15s;border:2px solid transparent;
+    }
+    .calc-tab.active,.calc-tab:hover{background:var(--brand);color:#fff;}
+
+    /* Notes */
+    .calc-notes{
+      background:var(--items-bg);border-radius:var(--r-sm);
+      border:1px solid var(--border-tint);padding:14px 15px;margin-bottom:16px;
+    }
+    .calc-notes-lbl{
+      font-size:10px;font-weight:700;color:var(--text-light);
+      text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;
+      display:flex;align-items:center;gap:6px;
+    }
+    .calc-notes-lbl svg{width:12px;height:12px;stroke:var(--text-light);fill:none;stroke-width:1.8;}
+    .calc-notes-ta{
+      width:100%;background:var(--input-bg);
+      border:1px solid var(--border-tint);border-radius:8px;
+      padding:9px 12px;font-size:13px;color:var(--text);
+      font-family:inherit;resize:none;
+      transition:border-color .15s,box-shadow .15s;
+    }
+    .calc-notes-ta:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--border-tint);}
+    .calc-notes-ta::placeholder{color:var(--placeholder);}
+
+    /* Summary box */
+    .calc-summary{
+      background:var(--brand-light);border-radius:var(--r-sm);
+      padding:14px 16px;margin-bottom:16px;
+      border:1px solid var(--border-tint);
+      display:none;
+    }
+    .calc-summary.visible{display:block;}
+    .calc-summary-title{font-size:11px;font-weight:700;color:var(--brand-dark);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+    .calc-summary-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text-mid);padding:4px 0;border-bottom:1px solid var(--border-tint);}
+    .calc-summary-row:last-child{border-bottom:none;font-weight:700;color:var(--brand-deep);font-size:14px;padding-top:8px;}
+
+    /* Print btn */
+    .calc-print-btn{
+      width:100%;padding:12px;border-radius:var(--r-sm);
+      background:var(--brand-light);color:var(--brand-dark);
+      font-size:13px;font-weight:600;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      transition:background .15s;margin-top:8px;
+    }
+    .calc-print-btn:hover{background:var(--print-hover);}
+    .calc-print-btn svg{width:15px;height:15px;stroke:var(--brand-dark);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+    /* Dark mode text-contrast tweaks for brand-light chips */
+    [data-theme="dark"] .ctag,
+    [data-theme="dark"] .calc-tab,
+    [data-theme="dark"] .calc-summary-title,
+    [data-theme="dark"] .calc-print-btn{color:#C4A6F0;}
+    [data-theme="dark"] .ctag svg{stroke:#C4A6F0;}
+    [data-theme="dark"] .calc-print-btn svg{stroke:#C4A6F0;}
+    [data-theme="dark"] .calc-tab.active,
+    [data-theme="dark"] .calc-tab:hover{color:#fff;}
+    [data-theme="dark"] .calc-feature{box-shadow:none;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--brand-deep);color:#fff;padding:13px 26px;border-radius:50px;font-size:13px;font-weight:500;opacity:0;transition:transform .3s ease,opacity .3s ease;pointer-events:none;z-index:9999;white-space:nowrap;box-shadow:var(--sh);}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+    /* FOOTER */
+    .footer{background:var(--brand);padding:64px 0 0;margin-top:0;}
+    [data-theme="dark"] .footer{background:#0D0820;border-top:1px solid rgba(123,95,204,0.2);}
+    .footer-inner{display:grid;grid-template-columns:1.4fr 0.3fr 1fr 1.2fr 1.1fr;gap:44px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,0.15);}
+    .footer-divider{width:1px;background:rgba(255,255,255,0.2);}
+    .footer-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+    .footer-logo-row svg{width:42px;height:42px;}
+    .footer-logo-row span{color:#fff;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+    .footer-tagline{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:10px;padding:14px 16px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;}
+    .footer-col h4{color:#fff;font-size:16px;font-weight:700;font-style:italic;margin-bottom:20px;}
+    .footer-col li{margin-bottom:12px;}
+    .footer-col li a{color:rgba(255,255,255,0.72);font-size:14px;transition:color .15s;}
+    .footer-col li a:hover{color:#fff;}
+    .footer-contact-line{color:rgba(255,255,255,0.72);font-size:14px;margin-bottom:10px;}
+    .footer-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .fsoc{width:46px;height:46px;background:var(--brand-deep);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+    .fsoc:hover{background:var(--brand-dark);}
+    .fsoc svg{width:20px;height:20px;fill:#fff;}
+    .footer-bottom{padding:18px 0;text-align:center;}
+    .footer-bottom p{color:rgba(255,255,255,0.42);font-size:13px;}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .calc-layout{grid-template-columns:1fr;}
+      .calc-info-panel{position:static;}
+    }
+    @media(max-width:768px){
+      .nav-links,.nav-sep,.nav-auth,.theme-toggle{display:none;}
+      .hamburger{display:flex;}
+      .footer-inner{grid-template-columns:1fr 1fr;}
+      .footer-divider{display:none;}
+    }
+    @media(max-width:540px){
+      .footer-inner{grid-template-columns:1fr;gap:32px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="nav-logo">
+      <svg
+   width="13mm"
+   height="26mm"
+   viewBox="101 137 14 15"
+   version="1.1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="LOGO DIBUJO terminado pequeño centrado.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="true"
+     inkscape:zoom="0.68862935"
+     inkscape:cx="405.87872"
+     inkscape:cy="553.99904"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 148.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="210 : 148.5 : 1"
+       inkscape:persp3d-origin="105 : 99 : 1" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer">
+    <ellipse
+       style="fill:#663399;stroke-width:0.264583"
+       cx="107.79093"
+       cy="151.78036"
+       rx="6.8348937"
+       ry="0.4628298" />
+    <rect
+       style="fill:#663399;stroke-width:0.264582"
+       width="13.669788"
+       height="0.5374797"
+       x="100.95604"
+       y="151.81021" />
+    <path
+       d="m 101.68672,138.32843 2.83006,0.881 0.0134,1.8064 c -0.99861,0.70942 -1.86101,1.27545 -2.77184,1.9117 z"
+       style="fill:#663399;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#663399;stroke-width:0.264585"
+       d="m 112.38258,144.12226 c -0.0406,7.57237 -0.0406,7.57237 -0.0406,7.57237 l -0.28416,0.075 -0.12177,-0.11246 -0.0406,-7.53488 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264585"
+       d="m 108.8209,144.03767 c 3.48721,0.0399 3.48721,0.0399 3.48721,0.0399 l 0.0345,0.27954 -0.0518,0.1198 -3.46995,0.0399 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264585"
+       d="m 103.53728,142.48465 c -0.0507,9.49424 -0.0507,9.49424 -0.0507,9.49424 l -0.35518,0.094 -0.15223,-0.141 -0.0507,-9.44724 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264583"
+       d="m 109.1497,140.59202 -0.008,11.12049 -0.2664,0.11127 -0.11416,-0.16692 c -0.009,-3.73095 0.0434,-7.52208 -0.0381,-11.18304 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.24948,145.07955 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 111.99169,148.03628 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.13081,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.02475,147.69337 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.02475,147.35046 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 111.95862,147.03613 c -3.14637,-0.007 -3.14637,-0.007 -3.14637,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.05781,146.69322 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.05781,146.35031 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0215 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.09088,146.03597 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.05781,145.72164 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.02475,144.77864 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.02737,145.42271 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.01941,148.66765 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.01941,148.35332 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.10929,149.55044 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.04316,149.26468 c -3.14637,-0.007 -3.14637,-0.007 -3.14637,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.07622,148.97892 c -3.14637,-0.007 -3.14637,-0.007 -3.14637,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.01147,150.46848 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 111.97841,150.15415 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.04453,149.86839 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.06724,151.30234 c -3.45846,0.007 -3.45846,0.007 -3.45846,0.007 l 0.1511,0.0523 0.13129,0.0224 3.49425,0.007 z"
+       inkscape:transform-center-x="0.0092605458"
+       inkscape:transform-center-y="-0.00045372299" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 112.09581,151.06346 c -3.30856,-0.007 -3.30856,-0.007 -3.30856,-0.007 l -0.0328,-0.0518 0.0491,-0.0222 3.29218,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 111.98119,150.7573 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.13081,-0.007 z" />
+    <path
+       style="fill:#663399;stroke-width:0.264584"
+       d="m 106.64142,139.01011 c 0.0796,4.49252 -0.0254,6.0002 -0.038,12.86488 l -0.2664,0.12737 -0.11416,-0.19106 c -0.0138,-4.56826 0.12258,-8.36365 -0.0381,-12.80119 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.48957,150.26373 0.007,0.52784 1.20301,0.48058 1.25213,0.52137 0.0131,-0.63774 z"
+       style="fill:#663399;stroke-width:0.264579"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.13611,139.65015 0.15309,0.60553 1.07599,0.31967 1.59815,0.5923 -0.0527,-0.64894 z"
+       style="fill:#663399;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.26457,141.97923 0.007,0.51666 0.9386,0.32426 1.66492,0.53957 -0.0175,-0.53655 z"
+       style="fill:#663399;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.32546,144.03957 0.008,0.52784 0.97722,0.33127 1.73345,0.55124 -0.0182,-0.54816 z"
+       style="fill:#663399;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.35236,146.15963 0.007,0.52784 0.87138,0.33127 1.54569,0.55124 -0.0162,-0.54816 z"
+       style="fill:#663399;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.37204,148.21996 0.007,0.52784 0.87138,0.33128 1.54571,0.55124 -0.0163,-0.54816 z"
+       style="fill:#663399;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 102.91565,142.56478 0.52852,0.0497 1.26329,-0.79843 1.55272,-1.02837 0.0994,-0.55723 z"
+       style="fill:#663399;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:#663399;stroke-width:0.264585"
+       d="m 104.52684,142.48243 -0.0507,9.05074 -0.35519,0.0896 -0.15222,-0.13442 -0.0507,-8.64761 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:#663399;stroke-width:0.264585"
+       d="m 105.70115,141.79109 -0.0507,9.73078 -0.35519,0.0963 -0.15222,-0.14451 -0.0507,-9.29737 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 101.7702,142.34336 0.73068,-0.57573 -0.0457,9.61252 -0.71546,0.12184 z"
+       style="fill:#663399;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 105.27578,139.03803 1.33005,-1.02575 -0.0628,2.16067 c -0.65892,0.60014 -0.61897,0.50971 -1.21998,1.04796 z"
+       style="fill:#663399;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 106.50409,138.01712 1.10418,0.40184 0.0395,2.13285 -1.09555,-0.25924 z"
+       style="fill:#663399;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 107.05274,138.86174 -1.00543,-0.23841 c 0.0257,0.008 0.41081,-2.43133 0.41081,-2.43133 z"
+       style="fill:#663399;stroke-width:0.264583"
+       sodipodi:nodetypes="cccc" />
+    <path
+       d="m 108.06341,138.51927 0.25175,0.0777 0.009,2.27782 -0.24978,-0.24092 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 108.78225,138.7553 0.25175,0.0777 0.009,2.27782 -0.24978,-0.24091 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 109.50345,139.06716 0.25175,0.0906 0.009,5.37039 -0.28023,-0.0808 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 110.17304,139.301 0.25175,0.0851 0.009,5.04738 -0.24978,-0.2562 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 110.87913,139.57189 0.25175,0.0797 0.009,4.72437 -0.24978,-0.16288 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 111.44739,139.7811 0.2822,0.0802 -0.024,4.39541 -0.24586,-0.13607 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 112.0804,140.01929 0.25175,0.0906 0.009,5.37039 -0.24978,-0.55853 z"
+       style="fill:#663399;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 112.65018,144.14266 1.51223,0.40446 0.0591,6.73208 -1.50893,-0.25532 z"
+       style="fill:#663399;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <rect
+       style="fill:#663399;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.31496"
+       y="139.55904" />
+    <rect
+       style="fill:#663399;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.31125"
+       y="138.91891" />
+    <rect
+       style="fill:#663399;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.30946"
+       y="138.28989" />
+    <rect
+       style="fill:#663399;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.31421"
+       y="137.66283" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.78506"
+       y="147.91628"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.31696"
+       y="74.299049"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.8514"
+       y="145.19122"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.266833"
+       width="0.048141908"
+       height="0.32853204"
+       x="-123.12083"
+       y="158.83116"
+       transform="matrix(0.35952096,-0.93313701,0.98307661,0.18319494,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.88073"
+       y="144.48766"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.91338"
+       y="143.79742"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.79977"
+       y="146.60201"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.78658"
+       y="147.24513"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.39236"
+       y="145.1136"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.40734"
+       y="145.82701"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.35493"
+       y="144.45723"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.41317"
+       y="146.48853"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.32182"
+       y="143.0956"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.32586"
+       y="143.79147"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.78259"
+       y="148.55542"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.82751"
+       y="139.64636"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.08607"
+       y="132.92746"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.23179"
+       y="137.78625"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.83314"
+       y="137.97879"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.10125"
+       y="133.68521"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.79252"
+       y="137.20715"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.15835"
+       y="134.55542"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.74473"
+       y="135.18042"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.7324"
+       y="134.40482"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.30886"
+       y="142.17882"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.8574"
+       y="138.76729"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.11591"
+       y="66.903084"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.09698"
+       y="70.542961"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.23311"
+       y="71.514595"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.25739"
+       y="73.465561"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.23491"
+       y="72.393097"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.18994"
+       y="75.199852"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.22112"
+       y="76.114021"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.14359"
+       y="66.176811"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.14503"
+       y="65.452286"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.05515"
+       y="76.829109"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.06218"
+       y="77.325546"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="161.99751"
+       y="78.248894"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#663399;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="161.9379"
+       y="79.156487"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+  </g>
+</svg>
+      <span class="nav-brand">BuildMetrick</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a><span class="nav-sep">|</span>
+      <a href="about.html">About Us</a><span class="nav-sep">|</span>
+      <a href="services.html">Services</a><span class="nav-sep">|</span>
+      <a href="calculator.html" class="active">Calculator</a><span class="nav-sep">|</span>
+      <a href="team.html">Our Team</a><span class="nav-sep">|</span>
+      <a href="contact.html">Contact Us</a>
+    </div>
+    <div class="nav-auth">
+      <a href="login.html" class="nav-login">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Login
+      </a>
+      <a href="signup.html" class="nav-signup">Sign Up</a>
+      <div class="theme-toggle">
+        <span class="theme-toggle-label" id="theme-label">Dark</span>
+        <button class="theme-toggle-btn" id="theme-btn" aria-label="Toggle theme" title="Switch light/dark mode">
+          <div class="theme-toggle-track"></div>
+          <div class="theme-toggle-thumb">
+            <svg class="icon-moon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </div>
+        </button>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html">Home</a><a href="about.html">About Us</a><a href="services.html">Services</a>
+  <a href="calculator.html">Calculator</a><a href="team.html">Our Team</a><a href="contact.html">Contact Us</a>
+  <a href="login.html">Login</a><a href="signup.html">Sign Up</a>
+  <div class="mobile-theme-row">
+    <span class="mobile-theme-label" id="mobile-theme-label">Dark Mode</span>
+    <button class="theme-toggle-btn" id="theme-btn-mobile" aria-label="Toggle theme" style="width:48px;height:26px;">
+      <div class="theme-toggle-track"></div>
+      <div class="theme-toggle-thumb">
+        <svg class="icon-moon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- CALCULATOR PAGE -->
+<div class="calc-page">
+  <div class="calc-page-inner">
+    <div class="container">
+      <div class="calc-layout">
+
+        <!-- ── LEFT: INFO PANEL ── -->
+        <div class="calc-info-panel">
+          <div class="calc-info-badge">
+            <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+            Material Calculator
+          </div>
+          <h1>Calculate Your<br><span>Project Materials</span></h1>
+          <p>Instantly estimate the cost and quantity of construction materials needed for your project. Select your materials, adjust quantities, and get a complete summary.</p>
+
+          <div class="calc-features">
+            <div class="calc-feature">
+              <div class="calc-feature-icon">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div class="calc-feature-text">
+                <strong>Real-time calculation</strong>
+                <span>Total updates instantly as you add materials</span>
+              </div>
+            </div>
+            <div class="calc-feature">
+              <div class="calc-feature-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div class="calc-feature-text">
+                <strong>Panama market prices</strong>
+                <span>Updated local prices for all materials</span>
+              </div>
+            </div>
+            <div class="calc-feature">
+              <div class="calc-feature-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+              </div>
+              <div class="calc-feature-text">
+                <strong>Printable summary</strong>
+                <span>Export or print your full order report</span>
+              </div>
+            </div>
+            <div class="calc-feature">
+              <div class="calc-feature-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="calc-feature-text">
+                <strong>Verified prices</strong>
+                <span>All prices reviewed and validated by experts</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-tags">
+            <span class="ctag">
+              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Panamá
+            </span>
+            <span class="ctag">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Auto Calculation
+            </span>
+            <span class="ctag">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Verified Prices
+            </span>
+          </div>
+        </div>
+
+        <!-- ── RIGHT: CALCULATOR CARD ── -->
+        <div class="calc-card">
+
+          <!-- Header -->
+          <div class="calc-head">
+            <div class="calc-head-row">
+              <div class="calc-brand-row">
+                <div class="calc-brand-icon">
+                  <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><rect x="8" y="10" width="2" height="2"/><rect x="11" y="10" width="2" height="2"/><rect x="14" y="10" width="2" height="2"/></svg>
+                </div>
+                <div>
+                  <div class="calc-brand-name">BuildMetrick</div>
+                  <div class="calc-brand-sub">Material Order Form</div>
+                </div>
+              </div>
+              <button class="calc-confirm-btn" onclick="confirmarOrden()">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Confirm Order
+              </button>
+            </div>
+            <div class="calc-total-pill">
+              <div>
+                <div class="calc-pill-lbl">Estimated Total + ITBMS</div>
+                <div class="calc-pill-val" id="calc-total">$0.00</div>
+              </div>
+              <div style="text-align:right">
+                <div class="calc-pill-lbl">Units</div>
+                <div class="calc-pill-val" id="calc-units">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="calc-body">
+
+            <!-- Category tabs -->
+            <div class="calc-sub-lbl">Category</div>
+            <div class="calc-tabs">
+              <div class="calc-tab active" onclick="setCategory('masonry',this)">Masonry</div>
+              <div class="calc-tab" onclick="setCategory('finishing',this)">Finishing</div>
+              <div class="calc-tab" onclick="setCategory('structure',this)">Structure</div>
+            </div>
+
+            <!-- Materials label -->
+            <div class="calc-sub-lbl">Construction Materials</div>
+
+            <!-- MASONRY ITEMS (default) -->
+            <div class="calc-items-wrap" id="cat-masonry">
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="4" rx="1"/><rect x="3" y="13" width="8" height="4" rx="1"/><rect x="13" y="13" width="8" height="4" rx="1"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Bricks</div>
+                  <div class="ci-price">$5.00 / unit</div>
+                </div>
+                <div class="ci-counter">                  
+                  <input
+  class="ci-qty"
+  id="q-bricks"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('bricks', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-bricks">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5c0 5-5 11-5 11S7 12 7 7a5 5 0 0 1 5-5z"/><circle cx="12" cy="7" r="2"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Cement</div>
+                  <div class="ci-price">$7.00 / bag</div>
+                </div>
+                <div class="ci-counter">                  
+                  <input
+  class="ci-qty"
+  id="q-cement"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('cement', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-cement">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Quicklime</div>
+                  <div class="ci-price">$8.00 / sack</div>
+                </div>
+                <div class="ci-counter">                  
+                  <input
+  class="ci-qty"
+  id="q-quicklime"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('quicklime', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-quicklime">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Dry Lime</div>
+                  <div class="ci-price">$8.00 / sack</div>
+                </div>
+                <div class="ci-counter">                  
+                  <input
+  class="ci-qty"
+  id="q-drylime"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('drylime', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-drylime">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">                  
+                  <svg viewBox="0 0 16 16" width="32" height="32" >
+  
+  <path d="M1.5 14h13"/>
+  <path d="M2.2 14c1.2-4 3.2-6.5 5.8-6.5s4.6 2.5 5.8 6.5"/>
+
+  
+  <circle cx="4.2" cy="12.2" r=".45"/>
+  <circle cx="6.3" cy="10.8" r=".45"/>
+  <circle cx="8.5" cy="12.5" r=".45"/>
+  <circle cx="10.8" cy="10.7" r=".45"/>
+  <circle cx="12.2" cy="12.8" r=".45"/>
+  <circle cx="8" cy="9.2" r=".45"/>
+  <circle cx="5.5" cy="13" r=".45"/>
+                     </svg>
+                  
+                  </svg>
+
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Sand</div>
+                  <div class="ci-price">$12.00 / m³</div>
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-sand"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('sand', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-sand">$0</div>
+              </div>
+
+            </div><!-- /masonry -->
+
+            <!-- FINISHING ITEMS (hidden by default) -->
+            <div class="calc-items-wrap" id="cat-finishing" style="display:none">
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="2" y1="15" x2="22" y2="15"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">White Paint</div>
+                  <div class="ci-price">$18.00 / gallon</div>               
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-paint"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('paint', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-paint">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Plaster</div>
+                  <div class="ci-price">$9.00 / bag</div>
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-plaster"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('plaster', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-plaster">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Ceramic (m²)</div>
+                  <div class="ci-price">$22.00 / m²</div>
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-ceramic"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('ceramic', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-ceramic">$0</div>
+              </div>
+
+            </div>
+                      
+            <div class="calc-items-wrap" id="cat-structure" style="display:none">
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                 <svg viewBox="0 0 16 16">
+  <path d="M2 12.5L11.5 3L14 5.5L4.5 15Z"/>
+  <path
+    d="M4.2 12.3L11.3 5.2L11.8 5.7L4.7 12.8Z"
+    fill="white"
+  />
+  <path d="M5.5 9.8L7 11.3"/>
+  <path d="M9.2 6.1L10.7 7.6"/>
+        </svg>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">#3 Rebar</div>
+                  <div class="ci-price">$4.50 / rod</div>
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-rebar 3"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('rebar 3', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-rebar 3">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                 <svg viewBox="0 0 16 16">
+
+  <path d="M2.5 4.5L4.5 2.5L6 4L4 6Z"/>
+  <path d="M3.5 4.5L4.5 3.5L5 4L4 5Z" fill="white"/>
+  <path d="M5 9L8.5 5.5L10 7L6.5 10.5Z"/>
+  <path d="M6.2 9L8.5 6.7L9 7.2L6.7 9.5Z" fill="white"/>
+  <path d="M9.5 11.5L11.5 9.5L13 11L11 13Z"/>
+  <path d="M10.5 11.5L11.5 10.5L12 11L11 12Z" fill="white"/>
+
+</svg>
+
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">#4 Rebar</div>
+                  <div class="ci-price">$6.50 / rod</div>
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-rebar 4"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('rebar 4', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-rebar 4">$0</div>
+              </div>
+
+              <div class="calc-item">
+                <div class="ci-icon">
+                  <svg viewBox="0 0 20 16">
+
+  <path
+    d="M1.5 2.5H18.5V13.5H1.5Z"
+    fill="none"
+    stroke="#3C2880"
+    stroke-width="2"
+  />
+
+  <path
+    d="M3.5 4H8V12H3.5Z"
+    fill="none"
+    stroke="#3C2880"
+    stroke-width="2"
+  />
+
+  <path
+    d="M12 4H16.5V12H12Z"
+    fill="none"
+    stroke="#3C2880"
+    stroke-width="2"
+  />
+
+</svg>
+
+
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name">Block 6</div>
+                  <div class="ci-price">$1.20 / unit</div>
+                </div>
+                <div class="ci-counter">
+                  <input
+  class="ci-qty"
+  id="q-Block 6"
+  type="number"
+  value="0"
+  min="0"
+  oninput="cambiarDirecto('Block 6', this.value)"
+>
+                </div>
+                <div class="ci-sub" id="s-Block 6">$0</div>
+              </div>
+
+            </div><!-- /structure -->
+
+            <!-- Order Summary -->
+            <div class="calc-summary" id="order-summary">
+              <div class="calc-summary-title">Order Summary</div>
+              <div id="summary-rows"></div>
+            </div>
+
+            <!-- Notes -->
+            <div class="calc-sub-lbl">Project Notes</div>
+            <div class="calc-notes">
+              <div class="calc-notes-lbl">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Description
+              </div>
+              <textarea class="calc-notes-ta" id="project-notes" rows="3" placeholder="E.g.: Family house, North Zone, Panama City..."></textarea>
+            </div>
+
+            <!-- Print -->
+            <button class="calc-print-btn" onclick="imprimirOrden()">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print / Export Order
+            </button>
+
+          </div><!-- /calc-body -->
+        </div><!-- /calc-card -->
+
+      </div><!-- /calc-layout -->
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo-row">
+          <svg
+   width="13mm"
+   height="26mm"
+   viewBox="101 137 14 15"
+   version="1.1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="LOGO DIBUJO terminado pequeño centrado blanco footer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="true"
+     inkscape:zoom="0.68862935"
+     inkscape:cx="405.87872"
+     inkscape:cy="552.54688"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 148.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="210 : 148.5 : 1"
+       inkscape:persp3d-origin="105 : 99 : 1" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer">
+    <ellipse
+       style="fill:#fffafa;stroke-width:0.264583"
+       cx="107.79093"
+       cy="151.78036"
+       rx="6.8348937"
+       ry="0.4628298" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264582"
+       width="13.669788"
+       height="0.5374797"
+       x="100.95604"
+       y="151.81021" />
+    <path
+       d="m 101.68672,138.32843 2.83006,0.881 0.0134,1.8064 c -0.99861,0.70942 -1.86101,1.27545 -2.77184,1.9117 z"
+       style="fill:#fffafa;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264585"
+       d="m 112.38258,144.12226 c -0.0406,7.57237 -0.0406,7.57237 -0.0406,7.57237 l -0.28416,0.075 -0.12177,-0.11246 -0.0406,-7.53488 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264585"
+       d="m 108.8209,144.03767 c 3.48721,0.0399 3.48721,0.0399 3.48721,0.0399 l 0.0345,0.27954 -0.0518,0.1198 -3.46995,0.0399 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264585"
+       d="m 103.53728,142.48465 c -0.0507,9.49424 -0.0507,9.49424 -0.0507,9.49424 l -0.35518,0.094 -0.15223,-0.141 -0.0507,-9.44724 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264583"
+       d="m 109.1497,140.59202 -0.008,11.12049 -0.2664,0.11127 -0.11416,-0.16692 c -0.009,-3.73095 0.0434,-7.52208 -0.0381,-11.18304 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.24948,145.07955 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 111.99169,148.03628 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.13081,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.02475,147.69337 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.02475,147.35046 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 111.95862,147.03613 c -3.14637,-0.007 -3.14637,-0.007 -3.14637,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.05781,146.69322 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.05781,146.35031 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0215 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.09088,146.03597 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.05781,145.72164 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.02475,144.77864 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.02737,145.42271 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.01941,148.66765 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.01941,148.35332 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.10929,149.55044 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.04316,149.26468 c -3.14637,-0.007 -3.14637,-0.007 -3.14637,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.07622,148.97892 c -3.14637,-0.007 -3.14637,-0.007 -3.14637,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.01147,150.46848 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 111.97841,150.15415 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.04453,149.86839 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0311,-0.05 0.0467,-0.0214 3.1308,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.06724,151.30234 c -3.45846,0.007 -3.45846,0.007 -3.45846,0.007 l 0.1511,0.0523 0.13129,0.0224 3.49425,0.007 z"
+       inkscape:transform-center-x="0.0092605458"
+       inkscape:transform-center-y="-0.00045372299" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 112.09581,151.06346 c -3.30856,-0.007 -3.30856,-0.007 -3.30856,-0.007 l -0.0328,-0.0518 0.0491,-0.0222 3.29218,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 111.98119,150.7573 c -3.14638,-0.007 -3.14638,-0.007 -3.14638,-0.007 l -0.0312,-0.05 0.0467,-0.0214 3.13081,-0.007 z" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264584"
+       d="m 106.64142,139.01011 c 0.0796,4.49252 -0.0254,6.0002 -0.038,12.86488 l -0.2664,0.12737 -0.11416,-0.19106 c -0.0138,-4.56826 0.12258,-8.36365 -0.0381,-12.80119 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.48957,150.26373 0.007,0.52784 1.20301,0.48058 1.25213,0.52137 0.0131,-0.63774 z"
+       style="fill:#fffafa;stroke-width:0.264579"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.13611,139.65015 0.15309,0.60553 1.07599,0.31967 1.59815,0.5923 -0.0527,-0.64894 z"
+       style="fill:#fffafa;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.26457,141.97923 0.007,0.51666 0.9386,0.32426 1.66492,0.53957 -0.0175,-0.53655 z"
+       style="fill:#fffafa;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.32546,144.03957 0.008,0.52784 0.97722,0.33127 1.73345,0.55124 -0.0182,-0.54816 z"
+       style="fill:#fffafa;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.35236,146.15963 0.007,0.52784 0.87138,0.33127 1.54569,0.55124 -0.0162,-0.54816 z"
+       style="fill:#fffafa;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 106.37204,148.21996 0.007,0.52784 0.87138,0.33128 1.54571,0.55124 -0.0163,-0.54816 z"
+       style="fill:#fffafa;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 102.91565,142.56478 0.52852,0.0497 1.26329,-0.79843 1.55272,-1.02837 0.0994,-0.55723 z"
+       style="fill:#fffafa;stroke-width:0.264578"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264585"
+       d="m 104.52684,142.48243 -0.0507,9.05074 -0.35519,0.0896 -0.15222,-0.13442 -0.0507,-8.64761 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:#fffafa;stroke-width:0.264585"
+       d="m 105.70115,141.79109 -0.0507,9.73078 -0.35519,0.0963 -0.15222,-0.14451 -0.0507,-9.29737 z"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       d="m 101.7702,142.34336 0.73068,-0.57573 -0.0457,9.61252 -0.71546,0.12184 z"
+       style="fill:#fffafa;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 105.27578,139.03803 1.33005,-1.02575 -0.0628,2.16067 c -0.65892,0.60014 -0.61897,0.50971 -1.21998,1.04796 z"
+       style="fill:#fffafa;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 106.50409,138.01712 1.10418,0.40184 0.0395,2.13285 -1.09555,-0.25924 z"
+       style="fill:#fffafa;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 107.05274,138.86174 -1.00543,-0.23841 c 0.0257,0.008 0.41081,-2.43133 0.41081,-2.43133 z"
+       style="fill:#fffafa;stroke-width:0.264583"
+       sodipodi:nodetypes="cccc" />
+    <path
+       d="m 108.06341,138.51927 0.25175,0.0777 0.009,2.27782 -0.24978,-0.24092 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 108.78225,138.7553 0.25175,0.0777 0.009,2.27782 -0.24978,-0.24091 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 109.50345,139.06716 0.25175,0.0906 0.009,5.37039 -0.28023,-0.0808 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 110.17304,139.301 0.25175,0.0851 0.009,5.04738 -0.24978,-0.2562 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 110.87913,139.57189 0.25175,0.0797 0.009,4.72437 -0.24978,-0.16288 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 111.44739,139.7811 0.2822,0.0802 -0.024,4.39541 -0.24586,-0.13607 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 112.0804,140.01929 0.25175,0.0906 0.009,5.37039 -0.24978,-0.55853 z"
+       style="fill:#fffafa;stroke-width:0.264584"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       d="m 112.65018,144.14266 1.51223,0.40446 0.0591,6.73208 -1.50893,-0.25532 z"
+       style="fill:#fffafa;stroke-width:0.264583"
+       sodipodi:nodetypes="ccccc" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.31496"
+       y="139.55904" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.31125"
+       y="138.91891" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.30946"
+       y="138.28989" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264583"
+       width="0.060889918"
+       height="0.29859984"
+       x="112.31421"
+       y="137.66283" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.78506"
+       y="147.91628"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.31696"
+       y="74.299049"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.8514"
+       y="145.19122"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.266833"
+       width="0.048141908"
+       height="0.32853204"
+       x="-123.12083"
+       y="158.83116"
+       transform="matrix(0.35952096,-0.93313701,0.98307661,0.18319494,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.88073"
+       y="144.48766"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.91338"
+       y="143.79742"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.79977"
+       y="146.60201"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.78658"
+       y="147.24513"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.39236"
+       y="145.1136"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.40734"
+       y="145.82701"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.35493"
+       y="144.45723"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.41317"
+       y="146.48853"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.32182"
+       y="143.0956"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.32586"
+       y="143.79147"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.78259"
+       y="148.55542"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.82751"
+       y="139.64636"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.08607"
+       y="132.92746"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.23179"
+       y="137.78625"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.83314"
+       y="137.97879"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.10125"
+       y="133.68521"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.79252"
+       y="137.20715"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.15835"
+       y="134.55542"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.74473"
+       y="135.18042"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.7324"
+       y="134.40482"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-108.30886"
+       y="142.17882"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264589"
+       width="0.059799057"
+       height="0.30406126"
+       x="-110.8574"
+       y="138.76729"
+       transform="matrix(0.26354049,-0.96464834,0.9671595,0.25417023,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.11591"
+       y="66.903084"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.09698"
+       y="70.542961"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.23311"
+       y="71.514595"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.25739"
+       y="73.465561"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.23491"
+       y="72.393097"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.18994"
+       y="75.199852"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.22112"
+       y="76.114021"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.14359"
+       y="66.176811"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.14503"
+       y="65.452286"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.05515"
+       y="76.829109"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="162.06218"
+       y="77.325546"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="161.99751"
+       y="78.248894"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+    <rect
+       style="fill:#fffafa;stroke-width:0.264601"
+       width="0.060599551"
+       height="0.30007297"
+       x="161.9379"
+       y="79.156487"
+       transform="matrix(0.87017509,0.49274264,-0.50729264,0.86177386,0,0)" />
+  </g>
+</svg>
+          <span>BuildMetrick</span>
+        </div>
+        <div class="footer-tagline">We bring your dream structures into the modern world.</div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-col">
+        <h4>Quick Link</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li>
+          <li><a href="services.html">Services</a></li><li><a href="team.html">Our Team</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact us!</h4>
+        <p class="footer-contact-line">Superate San Miguelito</p>
+        <p class="footer-contact-line">+507 6548-9582</p>
+        <p class="footer-contact-line">BuildMetrick.Pa@gmail.com</p>
+      </div>
+      <div class="footer-col">
+        <h4>Follow us!</h4>
+        <div class="footer-social">
+          <a href="#" class="fsoc"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+          <a href="#" class="fsoc"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="#" class="fsoc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37a4 4 0 1 1-7.99.5 4 4 0 0 1 7.99-.5z"/>
+    <circle cx="17.5" cy="6.5" r="0.5"/>
+  </svg>
+</a>
+          <a href="#" class="fsoc">
+  <svg
+   width="120mm"
+   height="180mm"
+   viewBox="45 55 120 180"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="dibujo de X adecuado.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.68862935"
+     inkscape:cx="397.16576"
+     inkscape:cy="572.87712"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect3"
+       style="stroke-width:0.264999"
+       d="m 37.41675,58.00388 h 37.538626 l 98.056364,180.5537 h -39.4951 z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="rect3-8"
+       style="stroke-width:0.264999"
+       d="M 173.05296,58.508277 H 156.12829 L 38.064536,240.053 l 16.207693,0.47473 z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="rect3-1"
+       style="fill:#fffafa;stroke-width:0.264999"
+       d="M 61.155183,89.466967 83.594581,88.992217 151.98517,213.33727 H 129.45961 Z"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+</svg>
+</a>
+
+
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 BuildMetrick | All rights reserved</p></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── Theme toggle ── */
+  const htmlEl = document.documentElement;
+  const themeBtn = document.getElementById('theme-btn');
+  const themeBtnM = document.getElementById('theme-btn-mobile');
+  const themeLabel = document.getElementById('theme-label');
+  const mobileLabel = document.getElementById('mobile-theme-label');
+
+  const savedTheme = localStorage.getItem('bm-theme') || 'dark';
+  setTheme(savedTheme, false);
+
+  function setTheme(theme, save = true){
+    htmlEl.setAttribute('data-theme', theme);
+    if(save) localStorage.setItem('bm-theme', theme);
+    const isDark = theme === 'dark';
+    if(themeLabel) themeLabel.textContent = isDark ? 'Dark' : 'Light';
+    if(mobileLabel) mobileLabel.textContent = isDark ? 'Dark Mode' : 'Light Mode';
+  }
+
+  function toggleTheme(){
+    const current = htmlEl.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
+  themeBtn.addEventListener('click', toggleTheme);
+  themeBtnM.addEventListener('click', toggleTheme);
+
+  /* ── Hamburger ── */
+  const hamburger=document.getElementById('hamburger'),mobileMenu=document.getElementById('mobile-menu');
+  hamburger.addEventListener('click',()=>{hamburger.classList.toggle('open');mobileMenu.classList.toggle('open');});
+  mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{hamburger.classList.remove('open');mobileMenu.classList.remove('open');}));
+
+  /* ── Toast ── */
+  let toastTimer;
+  function showToast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg;t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>t.classList.remove('show'),3800);
+  }
+
+  /* ── Calculator data ── */
+
+const PRICES={
+    bricks:5,
+    cement:7,
+    quicklime:8,
+    drylime:8,
+    sand:12,
+    paint:18,
+    plaster:9,
+    ceramic:22,
+    'rebar 3':4.50,
+    'rebar 4':6.50,
+    'Block 6':1.20
+};
+
+const NAMES={
+    bricks:'Bricks',
+    cement:'Cement',
+    quicklime:'Quicklime',
+    drylime:'Dry Lime',
+    sand:'Sand',
+    paint:'White Paint',
+    plaster:'Plaster',
+    ceramic:'Ceramic',
+    'rebar 3':'Rebar #3',
+    'rebar 4':'Rebar #4',
+    'Block 6':'Block 6"'
+};
+
+const QTYS={};
+
+for(const k in PRICES) {
+    QTYS[k]=0;
+}
+
+
+/* ── BOTONES + Y − ── */
+
+function cambiar(item, delta){
+
+    QTYS[item] = Math.max(0, QTYS[item] + delta);
+
+    const qEl = document.getElementById('q-' + item);
+    const sEl = document.getElementById('s-' + item);
+
+    if(qEl) {
+        qEl.value = QTYS[item];
+    }
+
+    if(sEl) {
+        sEl.textContent = QTYS[item] > 0
+            ? '$' + (QTYS[item] * PRICES[item]).toFixed(2)
+            : '$0';
+    }
+
+    recalcular();
+    actualizarSummary();
+}
+
+
+/* ── ESCRIBIR EL NÚMERO MANUALMENTE ── */
+
+function cambiarDirecto(item, valor){
+
+    valor = parseFloat(valor) || 0;
+
+    if(valor < 0){
+        valor = 0;
+    }
+
+    QTYS[item] = valor;
+
+    const qEl = document.getElementById('q-' + item);
+    const sEl = document.getElementById('s-' + item);
+
+    if(qEl) {
+        qEl.value = valor;
+    }
+
+    if(sEl) {
+        sEl.textContent = valor > 0
+            ? '$' + (valor * PRICES[item]).toFixed(2)
+            : '$0';
+    }
+
+    recalcular();
+    actualizarSummary();
+}
+
+
+/* ── TOTAL ── */
+
+function recalcular(){
+
+    let total=0;
+    let units=0;
+
+    for(const k in QTYS){
+        total += QTYS[k] * PRICES[k] * (1.07); // 7% tax
+        units += QTYS[k];
+    }
+
+    document.getElementById('calc-total').textContent =
+        '$' + total.toFixed(2);
+
+    document.getElementById('calc-units').textContent =
+        units;
+}
+
+
+/* ── SUMMARY ── */
+
+function actualizarSummary(){
+
+    const activeItems =
+        Object.entries(QTYS).filter(([,v])=>v>0);
+
+    const box =
+        document.getElementById('order-summary');
+
+    const rows =
+        document.getElementById('summary-rows');
+
+    if(activeItems.length===0){
+        box.classList.remove('visible');
+        return;
+    }
+
+    box.classList.add('visible');
+
+    let html='';
+    let total=0;
+
+    activeItems.forEach(([k,v])=>{
+
+        const sub=v*PRICES[k];
+
+        total+=sub;
+
+        html+=`
+            <div class="calc-summary-row">
+                <span>${NAMES[k]} × ${v}</span>
+                <span>$${sub.toFixed(2)}</span>
+            </div>
+        `;
+    });
+
+    html+=`
+        <div class="calc-summary-row">
+            <span>TOTAL</span>
+            <span>$${total.toFixed(2)}</span>
+        </div>
+    `;
+
+    rows.innerHTML=html;
+}
+
+  /* ── Category tabs ── */
+  function setCategory(cat,el){
+    document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('[id^="cat-"]').forEach(c=>c.style.display='none');
+    document.getElementById('cat-'+cat).style.display='block';
+  }
+
+  /* ── Confirm order ── */
+  function confirmarOrden(){
+    let total=0;
+    for(const k in QTYS) total+=QTYS[k]*PRICES[k];
+    if(total===0){showToast('Add at least one material first.');return;}
+    const note=document.getElementById('project-notes').value;
+    const noteText=note?` — Note: "${note}"`:'';
+    showToast('✓ Order confirmed for $'+total.toFixed(2)+noteText);
+  }
+
+  /* ── Print order ── */
+  function imprimirOrden(){
+    let total=0;
+    const activeItems=Object.entries(QTYS).filter(([,v])=>v>0);
+    if(activeItems.length===0){showToast('Add materials before printing.');return;}
+    activeItems.forEach(([k,v])=>total+=v*PRICES[k]);
+    const note=document.getElementById('project-notes').value||'No notes';
+    let rows=activeItems.map(([k,v])=>`<tr><td>${NAMES[k]}</td><td style="text-align:center">${v}</td><td style="text-align:right">$${(v*PRICES[k]).toFixed(2)}</td></tr>`).join('');
+    const w=window.open('','_blank');
+    w.document.write(`
+      <html><head><title>BuildMetrick Order</title>
+      <style>body{font-family:Inter,sans-serif;padding:32px;color:#1a1a1a;}
+      h1{color:#5B3FA6;font-size:22px;margin-bottom:4px;}
+      p{color:#888;font-size:13px;margin-bottom:20px;}
+      table{width:100%;border-collapse:collapse;}
+      th{background:#5B3FA6;color:#fff;padding:10px 12px;text-align:left;font-size:13px;}
+      td{padding:9px 12px;border-bottom:1px solid #eee;font-size:14px;}
+      .total{font-weight:700;font-size:15px;background:#EDE9FA;}
+      .note{margin-top:20px;background:#f9f9f9;padding:12px;border-radius:8px;font-size:13px;}
+      </style></head><body>
+      <h1>BuildMetrick — Material Order</h1>
+      <p>Generated: ${new Date().toLocaleDateString()}</p>
+      <table>
+        <tr><th>Material</th><th style="text-align:center">Qty</th><th style="text-align:right">Subtotal</th></tr>
+        ${rows}
+        <tr class="total"><td colspan="2">TOTAL</td><td style="text-align:right">$${total.toFixed(2)}</td></tr>
+      </table>
+      <div class="note"><strong>Project Notes:</strong> ${note}</div>
+      </body></html>`);
+    w.document.close();
+    w.print();
+  }
+</script>
+</body>
+</html>
