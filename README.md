@@ -1,2 +1,0 @@
-# buildmetrick-website
-buildmetrick website
